@@ -1,0 +1,45 @@
+.barra-anuncio {
+  background-color: #212529;
+  color: #ffffff;
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 6px 12px;
+  letter-spacing: 0.3px;
+}
+
+.navbar-floresya {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f2e6e9;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  padding: 12px 0;
+}
+
+.logo-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--color-primario) !important;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-enlace {
+  color: #4b5563;
+  font-weight: 500;
+  padding: 8px 14px !important;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-enlace:hover, .nav-enlace.activo {
+  color: var(--color-primario) !important;
+}
+
+.badge-carrito {
+  font-size: 0.72rem;
+  padding: 4px 7px;
+}

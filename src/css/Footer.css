@@ -1,0 +1,16 @@
+.footer-floresya {
+  background-color: #1f2421;
+  color: #adb5bd;
+  padding: 60px 0 25px;
+  margin-top: 80px;
+}
+
+.footer-floresya a {
+  color: #ced4da;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-floresya a:hover {
+  color: var(--color-primario);
+}

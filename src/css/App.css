@@ -1,0 +1,40 @@
+/* ============================================================
+   FloresYa — Variables globales y estilos base
+   ============================================================ */
+:root {
+  --color-primario: #c0415a;
+  --color-secundario: #f7e8ec;
+  --color-acento: #e8a0b4;
+  --color-texto: #2d2d2d;
+  --color-fondo: #fff9fb;
+  --color-borde: #f2e6e9;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Botón floral principal */
+.btn-floral {
+  background-color: var(--color-primario);
+  color: #fff;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.btn-floral:hover,
+.btn-floral:focus {
+  background-color: #a8364d;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Links globales */
+a {
+  color: var(--color-primario);
+}
+a:hover {
+  color: #a8364d;
+}

@@ -1,0 +1,13 @@
+.catalogo-header {
+  background: linear-gradient(135deg, #fff0f3 0%, #fdf0ed 100%);
+  border-radius: 20px;
+  padding: 35px 25px;
+  margin-bottom: 30px;
+}
+
+.panel-filtros {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #f0e6e8;
+}
