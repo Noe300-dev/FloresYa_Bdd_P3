@@ -52,7 +52,9 @@ export default function App() {
   const [authAbierto, setAuthAbierto] = useState(false);
   const [ultimoPedido, setUltimoPedido] = useState(null);
 
-  const esAdmin = !!usuarioActual && usuarioActual.rol === 'Administrador';
+  const esAdmin =
+    !!usuarioActual &&
+    String(usuarioActual.rol || '').toUpperCase().includes('ADMIN');
 
   const cargarFlores = useCallback(async () => {
     try {
@@ -93,11 +95,11 @@ export default function App() {
       return;
     }
     api.getMisPedidos().then(setPedidos).catch(() => {});
-    if (usuarioActual.rol === 'Administrador') {
+    if (esAdmin) {
       api.getUsuarios().then(setUsuarios).catch(() => {});
       api.getTodosPedidos().then(setPedidosAdmin).catch(() => {});
     }
-  }, [usuarioActual && usuarioActual.id, usuarioActual && usuarioActual.rol]);
+  }, [usuarioActual?.id, usuarioActual?.rol, esAdmin]);
 
   useEffect(() => {
     localStorage.setItem('floresya_carrito', JSON.stringify(carrito));

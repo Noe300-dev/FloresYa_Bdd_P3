@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,6 +27,12 @@ public class SecurityConfig {
 
     @Value("${floresya.cors.origins}")
     private String[] corsOrigins;
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -40,37 +49,43 @@ public class SecurityConfig {
         };
 
         http
-    .csrf(AbstractHttpConfigurer::disable)
-    .cors(Customizer.withDefaults())
-    .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-    .authorizeHttpRequests(auth -> auth
-        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers("/error").permitAll()
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(Customizer.withDefaults())
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/error").permitAll()
 
-        // Documentation Swagger / OpenAPI
-        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+                // Documentation Swagger / OpenAPI
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-        // Público
-        .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
-        .requestMatchers(HttpMethod.GET, "/api/flores/stock-critico").hasRole("ADMIN")
-        .requestMatchers(HttpMethod.GET, "/api/flores", "/api/flores/**").permitAll()
+                // Público
+                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/flores/stock-critico").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/flores", "/api/flores/**").permitAll()
 
-        // Solo administrador
-        .requestMatchers("/api/flores", "/api/flores/**").hasRole("ADMIN")
-        .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
-        .requestMatchers(HttpMethod.GET, "/api/pedidos").hasRole("ADMIN")
-        .requestMatchers(HttpMethod.PUT, "/api/pedidos/*/estado").hasRole("ADMIN")
+                // Solo administrador
+                .requestMatchers("/api/flores", "/api/flores/**").hasRole("ADMIN")
+                .requestMatchers("/api/usuarios", "/api/usuarios/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/pedidos").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/pedidos/*/estado").hasRole("ADMIN")
 
-        // Cualquier usuario con sesión
-        .requestMatchers("/api/auth/me", "/api/pedidos", "/api/pedidos/**").authenticated()
+                // Cualquier usuario con sesión
+                .requestMatchers("/api/auth/me", "/api/pedidos", "/api/pedidos/**").authenticated()
 
-        .anyRequest().denyAll())
-    .httpBasic(basic -> basic.authenticationEntryPoint(noAutenticado))
-    .exceptionHandling(e -> e
-        .authenticationEntryPoint(noAutenticado)
-        .accessDeniedHandler(sinPermiso));
+                .anyRequest().denyAll())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(e -> e
+                .authenticationEntryPoint(noAutenticado)
+                .accessDeniedHandler(sinPermiso));
 
-return http.build();
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -88,5 +103,4 @@ return http.build();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
-
 }

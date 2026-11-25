@@ -103,7 +103,7 @@ export default function Navbar({
                   data-bs-toggle="dropdown"
                 >
                   <i className="bi bi-person-circle me-1"></i>
-                  <span className="small">{usuarioActual.nombre.split(' ')[0]}</span>
+                <span className="small">{(usuarioActual?.nombre?.trim() || 'Usuario').split(' ')[0]}</span>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end shadow border-0">
                   <li className="dropdown-header">

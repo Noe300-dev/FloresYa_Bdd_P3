@@ -33,7 +33,7 @@ public class AuthController {
         this.service = service;
         this.authenticationManager = authenticationManager;
         this.usuarioDetailsService = usuarioDetailsService;
-        this.jwtService = jwtService;
+        this.jwtService = jwtService;   
     }
 
     /** Valida correo y contraseña y devuelve el token JWT junto con los datos del usuario. */
