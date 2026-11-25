@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
                 // Público
-                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/register", "/api/auth/google").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/flores/stock-critico").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/flores", "/api/flores/**").permitAll()
 

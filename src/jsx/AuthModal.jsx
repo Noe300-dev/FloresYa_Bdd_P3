@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { validarCorreo } from '../js/floresUtils';
 import * as api from '../js/api';
 import '../css/Auth.css';
@@ -20,6 +21,20 @@ export default function AuthModal({ isOpen, onClose, onLoginExitoso }) {
     setError('');
     try {
       const usuario = await api.login(correo.trim().toLowerCase(), password);
+      setExito(`¡Bienvenido/a ${usuario.nombre}!`);
+      setTimeout(() => {
+        onLoginExitoso(usuario);
+        onClose();
+      }, 600);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleGoogle = async (credentialResponse) => {
+    setError('');
+    try {
+      const usuario = await api.loginConGoogle(credentialResponse.credential);
       setExito(`¡Bienvenido/a ${usuario.nombre}!`);
       setTimeout(() => {
         onLoginExitoso(usuario);
@@ -167,6 +182,25 @@ export default function AuthModal({ isOpen, onClose, onLoginExitoso }) {
                   Crear Cuenta
                 </button>
               </form>
+            )}
+
+            {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+              <>
+                <div className="d-flex align-items-center my-3">
+                  <hr className="flex-grow-1 m-0" />
+                  <small className="text-muted px-2">o continúa con</small>
+                  <hr className="flex-grow-1 m-0" />
+                </div>
+                <div className="d-flex justify-content-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogle}
+                    onError={() => setError('No se pudo iniciar sesión con Google.')}
+                    text={modo === 'login' ? 'signin_with' : 'signup_with'}
+                    shape="pill"
+                    locale="es"
+                  />
+                </div>
+              </>
             )}
 
             <div className="text-center mt-3 pt-3 border-top">

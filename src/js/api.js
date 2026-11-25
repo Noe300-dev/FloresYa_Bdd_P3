@@ -63,6 +63,21 @@ export async function login(correo, password) {
   return data?.usuario ?? data;
 }
 
+// Inicio de sesión con Google: se envía el ID token (credential) y el backend responde igual que /auth/login.
+export async function loginConGoogle(idToken) {
+  const data = await request('/auth/google', {
+    method: 'POST',
+    body: { idToken },
+    auth: false
+  });
+
+  if (data?.token) {
+    setToken(data.token);
+  }
+
+  return data?.usuario ?? data;
+}
+
 export const registrar = (datos) => request('/auth/register', { method: 'POST', body: datos, auth: false });
 export const me = () => request('/auth/me');
 
