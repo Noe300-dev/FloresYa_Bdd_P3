@@ -1,8 +1,14 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import FlorCard from './FlorCard';
 import '../css/Catalogo.css';
 
-export default function Catalogo({ flores, onAgregarAlCarrito, onVerDetalle }) {
+const API_URL = 'https://tu-api.com/api/flores';
+
+export default function Catalogo({ onAgregarAlCarrito, onVerDetalle }) {
+  const [flores, setFlores] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
   const [categoria, setCategoria] = useState('Todas');
   const [ocasion, setOcasion] = useState('Todas');
   const [busqueda, setBusqueda] = useState('');
@@ -11,24 +17,73 @@ export default function Catalogo({ flores, onAgregarAlCarrito, onVerDetalle }) {
   const categorias = ['Todas', 'Rosas', 'Tulipanes', 'Girasoles', 'Orquídeas', 'Ramos Mixtos', 'Condolencias'];
   const ocasiones = ['Todas', 'Amor y Romance', 'Cumpleaños', 'Aniversario', 'Agradecimiento', 'Condolencias'];
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function obtenerFlores() {
+      try {
+        setCargando(true);
+        setError(null);
+
+        const respuesta = await fetch(API_URL, { signal: controller.signal });
+        if (!respuesta.ok) {
+          throw new Error(`Error ${respuesta.status}: no se pudo cargar el catálogo`);
+        }
+
+        const data = await respuesta.json();
+        // Ajusta aquí si tu API devuelve { flores: [...] } o { data: [...] }
+        setFlores(Array.isArray(data) ? data : data.flores ?? []);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setError(err.message);
+        }
+      } finally {
+        setCargando(false);
+      }
+    }
+
+    obtenerFlores();
+    return () => controller.abort();
+  }, []);
+
   const floresFiltradas = useMemo(() => {
     return flores
       .filter((flor) => {
         const catOk = categoria === 'Todas' || flor.categoria === categoria;
         const ocOk = ocasion === 'Todas' || flor.ocasion === ocasion;
+        const term = busqueda.toLowerCase();
         const searchOk =
-          flor.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-          flor.codigo.toLowerCase().includes(busqueda.toLowerCase()) ||
-          flor.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+          (flor.nombre ?? '').toLowerCase().includes(term) ||
+          (flor.codigo ?? '').toLowerCase().includes(term) ||
+          (flor.descripcion ?? '').toLowerCase().includes(term);
         return catOk && ocOk && searchOk;
       })
       .sort((a, b) => {
         if (orden === 'precio-asc') return a.precio - b.precio;
         if (orden === 'precio-desc') return b.precio - a.precio;
-        if (orden === 'alfabetico') return a.nombre.localeCompare(b.nombre);
+        if (orden === 'alfabetico') return (a.nombre ?? '').localeCompare(b.nombre ?? '');
         return 0;
       });
   }, [flores, categoria, ocasion, busqueda, orden]);
+
+  if (cargando) {
+    return (
+      <div className="container py-5 text-center">
+        <div className="spinner-border text-danger" role="status"></div>
+        <p className="text-muted mt-2">Cargando catálogo...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container py-5 text-center">
+        <div className="alert alert-danger d-inline-block" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-4">

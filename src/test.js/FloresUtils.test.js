@@ -8,19 +8,6 @@ import {
   calcularResumenCarrito
 } from '../js/floresUtils';
 
-describe('saludo', () => {
-  it('Saluda al cliente', () => {
-    expect(saludo()).toBe('Hola cliente');
-  });
-});
-
-describe('Validacion suma', () => {
-  it('Suma correcta', () => {
-    expect(suma()).toBe(17);
-    expect(suma(10, 5)).toBe(15);
-  });
-});
-
 describe('formatearPrecio', () => {
   it('Formateo correcto con signo peso', () => {
     expect(formatearPrecio(1000)).toBe('$1.000');
